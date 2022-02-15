@@ -15,6 +15,8 @@ class TaskItem extends StatefulWidget {
 }
 
 class _TaskItemState extends State<TaskItem> {
+  //
+  // TextField için
   TextEditingController _taskNameController = TextEditingController();
   late LocalStorage _localStorage;
 
@@ -22,12 +24,13 @@ class _TaskItemState extends State<TaskItem> {
   void initState() {
     super.initState();
 
+    // Singleton instance
     _localStorage = locater<LocalStorage>();
-    _taskNameController.text = widget.task.name;
   }
 
   @override
   Widget build(BuildContext context) {
+    _taskNameController.text = widget.task.name;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
@@ -46,7 +49,9 @@ class _TaskItemState extends State<TaskItem> {
             ? Text(
                 widget.task.name,
                 style: const TextStyle(
-                    decoration: TextDecoration.lineThrough, color: Colors.grey),
+                    // Görev tamamlandığında görevin üstü çizilir.
+                    decoration: TextDecoration.lineThrough,
+                    color: Colors.grey),
               )
             : TextField(
                 ///
@@ -61,6 +66,7 @@ class _TaskItemState extends State<TaskItem> {
                 minLines: 1,
 
                 controller: _taskNameController,
+                // TextField alanında alttaki border çizgisi kaldırıldı.
                 decoration: const InputDecoration(border: InputBorder.none),
                 onSubmitted: (newValue) {
                   widget.task.name = newValue;

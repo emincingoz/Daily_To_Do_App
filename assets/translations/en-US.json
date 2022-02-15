@@ -1,0 +1,8 @@
+{
+    "outer_header": "Daily ToDo App",
+    "title": "What will you do today?",
+    "empty_task_list": "Let's add a task",
+    "add_task": "What is the task",
+    "remove_task": "This task has been deleted",
+    "search_failed": "We couldn't find what you're looking for"
+}

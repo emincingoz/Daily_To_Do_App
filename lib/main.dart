@@ -1,14 +1,15 @@
 import 'package:daily_todo_app/data/local_storage.dart';
-import 'package:daily_todo_app/widgets/task_list_item.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+import 'data/hive_local_storage.dart';
 import 'models/task_model.dart';
 import 'pages/home_page.dart';
 
-// get_it paketi ile Singleton design patern eklendi.
+// get_it paketi ile LocalStorage için Singleton design patern eklendi.
 final locater = GetIt.instance;
 
 void setup() {
@@ -33,6 +34,8 @@ Future<void> main() async {
   // uygulama ekrana gelmeden önce başlatılması ve ele alınması gereken işlemleri gerçekleştirir.
   WidgetsFlutterBinding.ensureInitialized();
 
+  await EasyLocalization.ensureInitialized();
+
   ///
   /// Saat ve şarj bilgilerinin olduğu status bar, normalde appBarın renginden hafif koyu renkli, bu koyuluğu kaldırmak için kullanılır.
   ///
@@ -42,7 +45,15 @@ Future<void> main() async {
   await setupHive();
 
   setup();
-  runApp(const MyApp());
+
+  runApp(
+    EasyLocalization(
+        supportedLocales: const [Locale('en', 'US'), Locale('tr', 'TR')],
+        path:
+            'assets/translations', // <-- change the path of the translation files
+        fallbackLocale: const Locale('en', 'US'),
+        child: const MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -52,7 +63,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Material App',
+      title: 'outer_header'.tr(),
       theme: ThemeData(
         primarySwatch: Colors.blue,
         appBarTheme: const AppBarTheme(
@@ -60,6 +71,11 @@ class MyApp extends StatelessWidget {
             backgroundColor: Colors.white,
             iconTheme: IconThemeData(color: Colors.black)),
       ),
+      localizationsDelegates: context.localizationDelegates,
+      supportedLocales: context.supportedLocales,
+
+      /// uygulama cihazın kendi diliyle başlasın
+      locale: context.deviceLocale,
       home: const HomePage(),
     );
   }

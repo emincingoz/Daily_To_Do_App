@@ -1,7 +1,10 @@
 import 'package:daily_todo_app/data/local_storage.dart';
+import 'package:daily_todo_app/helper/translation_helper.dart';
 import 'package:daily_todo_app/main.dart';
 import 'package:daily_todo_app/models/task_model.dart';
+import 'package:daily_todo_app/widgets/custom_search_delegate.dart';
 import 'package:daily_todo_app/widgets/task_list_item.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 
@@ -20,6 +23,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
+    // Singleton instance
     _localStorage = locater<LocalStorage>();
     _allTasks = <Task>[];
 
@@ -39,14 +43,16 @@ class _HomePageState extends State<HomePage> {
               _showAddTaskBottomSheet(context);
             },
             child: const Text(
-              "Bugün Neler Yapacaksın?",
+              'title',
               style: TextStyle(color: Colors.black),
-            ),
+            ).tr(),
           ),
           centerTitle: false,
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                _showSearchPage();
+              },
               icon: const Icon(Icons.search),
             ),
             IconButton(
@@ -65,17 +71,17 @@ class _HomePageState extends State<HomePage> {
                   return Dismissible(
                     background: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        SizedBox(
+                      children: [
+                        const SizedBox(
                           width: 8,
                         ),
-                        Icon(
+                        const Icon(
                           Icons.delete,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 8,
                         ),
-                        Text("Bu Görev Siliniyor!")
+                        const Text('remove_task').tr()
                       ],
                     ),
                     // oluşturulan farklı ListTile'ların keyleri birbirinden farklı olmalı.
@@ -89,8 +95,8 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               )
-            : const Center(
-                child: Text("Hadi Bir Görev Ekle..."),
+            : Center(
+                child: const Text('empty_task_list').tr(),
               ));
   }
 
@@ -114,29 +120,43 @@ class _HomePageState extends State<HomePage> {
             child: ListTile(
               title: TextField(
                 style: const TextStyle(fontSize: 20),
-                decoration: const InputDecoration(
-                  hintText: "Görev Nedir?",
+                decoration: InputDecoration(
+                  hintText: 'add_task'.tr(),
                   // TextField altında çıkan border çizgisini kaldırmak için kullanılır.
                   border: InputBorder.none,
                 ),
                 onSubmitted: (value) {
-                  // TextField içerisine input girildikten sonra onaylandığında kapanmasını sağlar.
-                  Navigator.of(context).pop();
-                  DatePicker.showTimePicker(context, showSecondsColumn: false,
-                      onConfirm: (time) async {
-                    if (value.length > 3) {
-                      var newTask = Task.create(name: value, createdAt: time);
-
-                      _allTasks.insert(0, newTask);
-                      await _localStorage.addTask(task: newTask);
-                      setState(() {});
-                    }
-                  });
+                  _dateTimePickerSetup(value);
                 },
               ),
             ),
           );
         });
+  }
+
+  void _dateTimePickerSetup(String value) {
+    // TextField içerisine input girildikten sonra onaylandığında kapanmasını sağlar.
+    Navigator.of(context).pop();
+    DatePicker.showTimePicker(
+      context,
+      locale: TranslationHelper.getDeviceLanguage(context),
+      showSecondsColumn: false,
+      onConfirm: (time) async {
+        if (value.length > 3) {
+          var newTask = Task.create(name: value, createdAt: time);
+
+          _allTasks.insert(0, newTask);
+          await _localStorage.addTask(task: newTask);
+          setState(() {});
+        }
+      },
+    );
+  }
+
+  void _showSearchPage() async {
+    await showSearch(
+        context: context, delegate: CustomSearchDelegate(allTasks: _allTasks));
+    _getAllTaskFromDb();
   }
 
   void _getAllTaskFromDb() async {
