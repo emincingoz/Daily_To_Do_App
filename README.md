@@ -1,9 +1,12 @@
 # Daily To Do App
 
 ## Used Packages
-* Tarih formatlama için intl paketi kullanıldı.
-* flutter_datetime_picker paketi kullanıldı.
+* Tarih formatlama için intl
+* flutter_datetime_picker
 * uuid paketi o an ki tarih bilgisine göre uniqe veriler üretmek için kullanıldı.
-* hive paketleri kullanıldı
-* get_it paketi kullanıldı
-* Easy_Localization paketi kullanıldı
+* hive
+* hive_flutter
+* build_runner
+* hive_generator
+* get_it
+* Easy_Localization
